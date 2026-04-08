@@ -1,0 +1,249 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Генератор иконок Smska</title>
+    <style>
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+        h1 {
+            margin: 0 0 10px;
+            color: #333;
+            font-size: 24px;
+        }
+        .subtitle {
+            color: #666;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+        canvas {
+            border: 3px solid #ddd;
+            border-radius: 15px;
+            margin: 20px 0;
+            display: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+        }
+        .buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin: 20px 0;
+        }
+        button {            padding: 15px 24px;
+            font-size: 16px;
+            font-weight: 600;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+        button:active {
+            transform: scale(0.98);
+        }
+        .btn-primary {
+            background: linear-gradient(135deg, #25D366, #128C7E);
+            color: white;
+        }
+        .btn-primary:hover {
+            box-shadow: 0 6px 16px rgba(37, 211, 102, 0.4);
+        }
+        .btn-secondary {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+        }
+        .btn-secondary:hover {
+            box-shadow: 0 6px 16px rgba(102, 126, 234, 0.4);
+        }
+        .btn-accent {
+            background: linear-gradient(135deg, #f093fb, #f5576c);
+            color: white;
+        }
+        .btn-accent:hover {
+            box-shadow: 0 6px 16px rgba(240, 147, 251, 0.4);
+        }
+        .info {
+            background: #f0f8ff;
+            padding: 15px;
+            border-radius: 10px;
+            margin: 20px 0;
+            font-size: 13px;
+            color: #555;
+            border-left: 4px solid #667eea;
+        }
+        .success {
+            background: #d4edda;
+            color: #155724;
+            padding: 12px;
+            border-radius: 8px;
+            margin-top: 15px;
+            font-size: 14px;
+            display: none;        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🎨 Генератор иконок</h1>
+        <div class="subtitle">Smska Messenger</div>
+        
+        <div class="info">
+            <strong>📱 Как использовать:</strong><br>
+            Нажмите на кнопку ниже — иконка автоматически скачается в папку «Загрузки»
+        </div>
+        
+        <div class="buttons">
+            <button class="btn-primary" onclick="generateIcon()">
+                💬 Иконка 512×512
+            </button>
+            <button class="btn-secondary" onclick="generateIcon192()">
+                📱 Иконка 192×192
+            </button>
+            <button class="btn-accent" onclick="generateMaskable()">
+                🎭 Maskable иконка
+            </button>
+        </div>
+        
+        <div class="success" id="successMsg">
+            ✅ Иконка успешно скачана!
+        </div>
+        
+        <canvas id="c" width="512" height="512"></canvas>
+    </div>
+    
+    <script>
+        function showSuccess() {
+            const msg = document.getElementById('successMsg');
+            msg.style.display = 'block';
+            setTimeout(() => {
+                msg.style.display = 'none';
+            }, 3000);
+        }
+        
+        function generateIcon() {
+            const c = document.getElementById('c');
+            const ctx = c.getContext('2d');
+            
+            // Очищаем
+            ctx.clearRect(0, 0, 512, 512);
+            
+            // Фон (градиент)
+            const gradient = ctx.createLinearGradient(0, 0, 512, 512);            gradient.addColorStop(0, '#25D366');
+            gradient.addColorStop(1, '#128C7E');
+            ctx.fillStyle = gradient;
+            
+            // Закруглённый квадрат
+            ctx.beginPath();
+            ctx.roundRect(0, 0, 512, 512, 100);
+            ctx.fill();
+            
+            // Тень
+            ctx.shadowColor = 'rgba(0,0,0,0.3)';
+            ctx.shadowBlur = 20;
+            ctx.shadowOffsetX = 5;
+            ctx.shadowOffsetY = 5;
+            
+            // Текст (эмодзи чата)
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 280px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.shadowColor = 'transparent';
+            ctx.fillText('💬', 256, 256);
+            
+            // Скачивание
+            c.toBlob(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'icon-512.png';
+                a.click();
+                showSuccess();
+            });
+        }
+        
+        function generateIcon192() {
+            const c = document.getElementById('c');
+            c.width = 192;
+            c.height = 192;
+            const ctx = c.getContext('2d');
+            
+            // Фон
+            const gradient = ctx.createLinearGradient(0, 0, 192, 192);
+            gradient.addColorStop(0, '#25D366');
+            gradient.addColorStop(1, '#128C7E');
+            ctx.fillStyle = gradient;
+            
+            ctx.beginPath();
+            ctx.roundRect(0, 0, 192, 192, 40);
+            ctx.fill();
+            
+            // Текст            ctx.fillStyle = 'white';
+            ctx.font = 'bold 100px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('💬', 96, 96);
+            
+            // Скачивание
+            c.toBlob(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'icon-192.png';
+                a.click();
+                showSuccess();
+                
+                // Возвращаем размер 512
+                c.width = 512;
+                c.height = 512;
+            });
+        }
+        
+        function generateMaskable() {
+            const c = document.getElementById('c');
+            c.width = 512;
+            c.height = 512;
+            const ctx = c.getContext('2d');
+            
+            // Очищаем
+            ctx.clearRect(0, 0, 512, 512);
+            
+            // Фон (прозрачный по краям)
+            ctx.fillStyle = '#25D366';
+            ctx.beginPath();
+            ctx.arc(256, 256, 256, 0, Math.PI * 2);
+            ctx.fill();
+            
+            // Текст
+            ctx.fillStyle = 'white';
+            ctx.font = 'bold 280px sans-serif';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText('💬', 256, 256);
+            
+            // Скачивание
+            c.toBlob(blob => {
+                const a = document.createElement('a');
+                a.href = URL.createObjectURL(blob);
+                a.download = 'icon-maskable.png';
+                a.click();
+                showSuccess();
+            });        }
+    </script>
+</body>
+</html>
